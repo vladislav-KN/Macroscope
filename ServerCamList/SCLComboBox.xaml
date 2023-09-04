@@ -1,0 +1,9 @@
+<UserControl x:Class="ServerCamList.SCLComboBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ServerCamList"
+             mc:Ignorable="d" Height="57" Width="436">
+    <ComboBox Name="cbApiData" SelectionChanged="cbApiData_SelectionChanged"/>
+</UserControl>
