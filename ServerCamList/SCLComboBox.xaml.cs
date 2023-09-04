@@ -36,8 +36,13 @@ namespace ServerCamList
 
         public string SetServerUrl
         {
+            get
+            {
+                return _api.ApiUrl;
+            }
             set
             {
+                //пересоздаем поток при изменении данных
                 _api = new ServerApi(value);
                 _token.Cancel();
                 _token = new CancellationTokenSource();
@@ -65,6 +70,11 @@ namespace ServerCamList
             _api = new ServerApi();
             _lockObj = new object();
         }
+
+        /// <summary>
+        /// поток получение информации о камерах
+        /// </summary>
+        /// <param name="cancellationToken">токен для завершения потока</param>
         private void UpdateComboboxData(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
@@ -123,9 +133,10 @@ namespace ServerCamList
                 Thread.Sleep(10000);
             }
         }
-
+      
         private void cbApiData_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            //вызов внешних ивентов на срабатывание внутреннего (SelectionChanged)
             CurentData = (ApiData) cbApiData.SelectedItem;
             SelectedDataChanged?.Invoke(this, EventArgs.Empty);
         }

@@ -20,7 +20,6 @@ using System.Windows.Media.Media3D;
 
 namespace Player
 {
-    public delegate void TransferImage(BitmapImage img);
     public class MjpegStream
     {
         private readonly HttpClient _client;
@@ -33,19 +32,27 @@ namespace Player
             _client = client;
             Options = option;
         }
-
+        /// <summary>
+        /// Поток передачи изображения
+        /// </summary>
+        /// <param name="token">токен для остановки потока</param>
+        /// <returns></returns>
         public async Task StreamAsync(CancellationToken token)
         {
+    
             using var request = new HttpRequestMessage(HttpMethod.Get, Options.Url);
             using var response = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
+            //Завершаем задачу если не удалось получить ответ от сервера
+            if(response is null || response.StatusCode != HttpStatusCode.OK) return; 
+
             using var responseStream = await response.Content.ReadAsStreamAsync(token);
             
-
+            //читаем данные
             while (!token.IsCancellationRequested)
             {
                 var str = ReadString(responseStream);
                 if (str != "--myboundary") break;
-                ReadString(responseStream);   
+                ReadString(responseStream);   //пропускаем тип данных
                 
                 var timestamp = ReadString(responseStream);
                 DateTime time;
@@ -53,9 +60,9 @@ namespace Player
                 {
                     time = DateTime.Now;
                 }
-                ReadString(responseStream);
-                ReadString(responseStream);
-              
+                ReadString(responseStream); //пропускаем дату в числовом формате
+                ReadString(responseStream); //пропускаем дату с данными о временной зоне
+
                 var length = ReadString(responseStream);
                 int imgLen;
                 if(!int.TryParse(length.Replace("Content-Length: ", ""), out imgLen))
@@ -70,14 +77,21 @@ namespace Player
 
         }
 
+
+        /// <summary>
+        /// Чтение строки из потока 
+        /// </summary>
+        /// <param name="stream">поток из которого получаем сообщение</param>
+        /// <returns>строка полученная в потоке данных</returns>
+        /// <exception cref="Exception"></exception>
         private string ReadString(Stream stream)
         {
             MemoryStream line = new MemoryStream(1024);
             line.SetLength(0);
             line.Position = 0;
             int _byte = stream.ReadByte();
-
-            while(_byte != '\n')
+            //читаем пока не будет перехода на следующую строку
+            while (_byte != '\n')
             {
                 if (_byte == -1)
                 {
@@ -90,6 +104,13 @@ namespace Player
             return Encoding.ASCII.GetString(line.ToArray());
 
         }
+
+        /// <summary>
+        /// Получение изображения из потока
+        /// </summary>
+        /// <param name="stream">поток откуда получаем изображение</param>
+        /// <param name="length">длина читаемого изображения</param>
+        /// <returns>массив байтов с информацией об изображении</returns>
         private async Task<byte[]> ReadBites(Stream stream, int length)
         {
             MemoryStream jpgms = new MemoryStream(10240);

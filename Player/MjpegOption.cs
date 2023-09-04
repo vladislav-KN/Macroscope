@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Player
 {
+    //настройка потока
     public class MjpegOption
     {
         public string? Url { get; set; }

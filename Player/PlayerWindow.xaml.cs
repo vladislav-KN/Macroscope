@@ -43,6 +43,7 @@ namespace Player
             }
             set 
             {
+                //пересоздаем поток при изменении данных
                 _token.Cancel();
                 while (_threads.Count > 0)
                     _threads.Dequeue().Join();
@@ -71,10 +72,14 @@ namespace Player
             Dispatcher.Invoke(()=> PlayerImage.Source = ConvertBytesToImage(imageBytes));
             Thread.Sleep(1000/FPS);
         }
-
+        /// <summary>
+        /// Преобразование массива байтов в изображение
+        /// </summary>
+        /// <param name="bytes">Полученный массив байтов с изображением</param>
+        /// <returns></returns>
         BitmapImage ConvertBytesToImage(byte[] bytes)
         {
-            using (var ms = new System.IO.MemoryStream(bytes))
+            using (var ms = new MemoryStream(bytes))
             {
                 var image = new BitmapImage();
                 image.BeginInit();

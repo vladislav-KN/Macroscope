@@ -37,7 +37,9 @@ namespace ServerConnection
         {
             _xmlDoc = new XmlDocument();
         }
-
+        /// <summary>
+        /// Получение новых данных с сервера
+        /// </summary>
         public async void UpdateXML()
         {
             try
@@ -70,7 +72,11 @@ namespace ServerConnection
         {
             return _xmlDoc;
         }
-
+        /// <summary>
+        /// Получение информции из XML документа
+        /// </summary>
+        /// <param name="xmlDoc">документ</param>
+        /// <returns></returns>
         public List<ApiData> GetData(XmlDocument xmlDoc)
         {
             List<ApiData> data = new List<ApiData>();
